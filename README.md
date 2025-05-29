@@ -150,6 +150,17 @@ Sensor de inclinação, simulando o MPU 6050 com o terceiro potenciômetro ↕�
  
 <br>
 
+## Explicando o <a href="https://github.com/JoaoF-Bertini/GS-Edge-Computing/blob/main/arduino-code.cc">Código</a> 🧑‍💻
+
+Precisamos incluir as bibliotecas para podermos ter acesso a métodos dos quais vamos precisar.
+ 
+Assim como também é preciso declarar, iniciando tais valores para podermos usá-los depois na aplicação.
+
+#include <Wire.h>
+#include "RTClib.h"
+#include "DHT.h"
+#include <LiquidCrystal_I2C.h>
+
 
 
 
