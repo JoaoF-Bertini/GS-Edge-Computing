@@ -154,7 +154,7 @@ Sensor de inclinação, simulando o MPU 6050 com o terceiro potenciômetro ↕�
 
 Precisamos incluir as bibliotecas para podermos ter acesso a métodos dos quais vamos precisar.
  
-Assim como também é preciso declarar, iniciando tais valores para podermos usá-los depois na aplicação.
+Assim como também é preciso declarar, iniciando tais valores para podermos usá-los depois na aplicação. 📖
 
 ```c
 #include <Wire.h>
@@ -163,6 +163,116 @@ Assim como também é preciso declarar, iniciando tais valores para podermos us�
 #include <LiquidCrystal_I2C.h>
 ```
 <hr>
+
+Depois vamos definir os pinos dos sensores: ultrassônico, gás (MQ2), inclinação (MPU analógico), chuva, pressão, temperatura/umidade (DHT22), LEDs e buzzers.
+
+Instancia os objetos para RTC, DHT e LCD com endereço 0x27. 🔌
+
+```c
+#define TRIG_PIN 3
+#define ECHO_PIN 2
+#define RAIN_SENSOR_PIN A1
+#define PRESSURE_SENSOR_PIN A2
+#define DHTPIN 4
+#define DHTTYPE DHT22
+#define MQ2_SENSOR_PIN A3
+#define MPU_SENSOR_PIN A0
+
+#define LED_VERDE 5
+#define LED_AMARELO 6
+#define LED_VERMELHO 7
+#define BUZZER 8
+
+#define LED_ROSA 9
+#define LED_LARANJA 10
+#define BUZZER_ESTRUTURA 12
+
+RTC_DS1307 rtc; 
+DHT dht(DHTPIN, DHTTYPE);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+```
+<hr>
+
+void setup() para inicializar a comunicação serial, pinos, sensores e módulos ⚙️
+
+```c
+Serial.begin(9600);
+
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_AMARELO, OUTPUT);
+  pinMode(LED_VERMELHO, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+  pinMode(LED_ROSA, OUTPUT);
+  pinMode(LED_LARANJA, OUTPUT);
+  pinMode(BUZZER_ESTRUTURA, OUTPUT);
+
+  dht.begin();
+  rtc.begin();
+  lcd.init();
+  lcd.backlight();
+```
+<hr>
+
+Com void loop() se programa a lógica de monitonaramento 🔁
+
+```c
+// Emite pulso ultrassônico e mede o tempo de retorno para calcular distância da água (em cm).
+digitalWrite(TRIG_PIN, LOW);
+delayMicroseconds(2);
+digitalWrite(TRIG_PIN, HIGH);
+delayMicroseconds(10);
+digitalWrite(TRIG_PIN, LOW);
+long duracao = pulseIn(ECHO_PIN, HIGH);
+float distancia = duracao * 0.034 / 2.0;
+
+//Leitura de sensores da chuva 
+int chuva = analogRead(RAIN_SENSOR_PIN);
+int pressaoRaw = analogRead(PRESSURE_SENSOR_PIN);
+float pressao = map(pressaoRaw, 0, 1023, 970, 1050);
+float temperatura = dht.readTemperature();
+float umidade = dht.readHumidity();
+
+// Cálculo e classificação do risco de enchente
+if (distancia < 200) risco += 3;
+if (umidade > 80) risco += 2;
+if (temperatura > 25) risco += 1;
+if (chuva <= 700) risco += 1;
+if (chuva <= 500) risco += 2;
+else if (pressao <= 1000) risco += 1;
+
+if (risco >= 6) nivelRisco = "CRIT";
+else if (risco >= 3) nivelRisco = "MOD";
+else nivelRisco = "BAIXO";
+
+// Alerta de enchente
+if (nivelRisco == "BAIXO") digitalWrite(LED_VERDE, HIGH);
+else if (nivelRisco == "MOD") digitalWrite(LED_AMARELO, HIGH);
+else {
+  digitalWrite(LED_VERMELHO, HIGH);
+  tone(BUZZER, 2000);
+}
+
+// Alerta de gás
+if (gas > 400) {
+  digitalWrite(LED_ROSA, HIGH);
+  tone(BUZZER_ESTRUTURA, 1000);
+}
+
+// Alerta de Estrutura
+if (inclinacao > 700 || inclinacao < 300) {
+  digitalWrite(LED_LARANJA, HIGH);
+}
+
+// Exibição no LCD Mostra em 4 linhas: Data/hora - Distância da água e pressão - Temperatura e umidade - Estado do sensor de chuva + risco calculado
+lcd.setCursor(0, 0); // Data e hora
+lcd.setCursor(0, 1); // Nível da água e pressão
+lcd.setCursor(0, 2); // Temperatura e umidade
+lcd.setCursor(0, 3); // Nível de chuva e risco
+```
+<hr>
+
 
 ## Funções Principais 🛠️
 
