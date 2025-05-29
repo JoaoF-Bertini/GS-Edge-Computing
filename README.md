@@ -156,10 +156,68 @@ Precisamos incluir as bibliotecas para podermos ter acesso a métodos dos quais 
  
 Assim como também é preciso declarar, iniciando tais valores para podermos usá-los depois na aplicação.
 
+```c
 #include <Wire.h>
 #include "RTClib.h"
 #include "DHT.h"
 #include <LiquidCrystal_I2C.h>
+```
+<hr>
+
+## Funções Principais 🛠️
+
+<ul>
+<li>
+displayTwoLineText: Exibe duas linhas de texto no LCD.
+</li>
+<li>
+verificaRiscoEnchente: Lê sensores de chuva, água, temperatura, umidade e calcula o nível de risco (baixo, médio, alto).
+</li>
+<li>
+verificaRiscoEstrutura: Lê o valor do sensor de gás e do potenciômetro. Ativa LED e buzzer específicos se valores ultrapassarem os limites críticos.
+</li>
+<li>
+loop: Executa a verificação de riscos continuamente, com alertas visuais e sonoros adequados.
+</li>
+</ul>
+<br>
+
+Módulo Enchente:
+<ul>
+<li>
+Define três níveis de risco baseados nos sensores de chuva e água.
+</li>
+<li>
+Imprime no LCD data/hora junto das medições.
+</li>
+<li>
+Buzzer emite som somente no nível crítico.
+</li>
+</ul>
+<br>
+
+Módulo Estrutura:
+
+<ul>
+<li>
+O potenciômetro simula variação de inclinação.
+</li>
+<li>
+O LED Laranja indica risco por inclinação.
+</li>
+<li>
+O sensor MQ-2 identifica gases inflamáveis.
+</li>
+<li>
+O LED Rosa e o buzzer específico são ativados em caso de risco de gás.
+</li>
+<li>
+Ambas as verificações ocorrem de forma independente mas são coordenadas no loop() principal.
+</li>
+</ul>
+<br>
+
+
 
 
 
