@@ -3,7 +3,7 @@
 #include "DHT.h"
 #include <LiquidCrystal_I2C.h>
 
-// === Pinos ===
+// === Pinos ==
 #define TRIG_PIN 3
 #define ECHO_PIN 2
 #define RAIN_SENSOR_PIN A1
